@@ -1,0 +1,66 @@
+{
+  "anchors": {
+    "corps": {
+      "id": "corps",
+      "display": { "fr": "corps", "en": "body" },
+      "cluster": "physical",
+      "satellites": ["cerveau", "sante", "marcher", "boire"]
+    },
+    "la_cuisine": {
+      "id": "la_cuisine",
+      "display": { "fr": "la cuisine", "en": "kitchen" },
+      "cluster": "maison",
+      "satellites": ["cuisiniere", "poele", "four", "evier", "boire"]
+    }
+  },
+  "satellites": {
+    "cerveau": {
+      "id": "cerveau",
+      "display": { "fr": "cerveau", "en": "brain" },
+      "cluster": "physical",
+      "parent": "corps"
+    },
+    "sante": {
+      "id": "sante",
+      "display": { "fr": "santé", "en": "health" },
+      "cluster": "physical",
+      "parent": "corps"
+    },
+    "marcher": {
+      "id": "marcher",
+      "display": { "fr": "marcher", "en": "walk" },
+      "cluster": "physical",
+      "parent": "corps"
+    },
+    "boire": {
+      "id": "boire",
+      "display": { "fr": "boire", "en": "drink" },
+      "cluster": "physical",
+      "parent": ["corps", "la_cuisine"]
+    },
+    "cuisiniere": {
+      "id": "cuisiniere",
+      "display": { "fr": "cuisinière", "en": "stove, cooktop" },
+      "cluster": "maison",
+      "parent": "la_cuisine"
+    },
+    "poele": {
+      "id": "poele",
+      "display": { "fr": "poêle", "en": "pan" },
+      "cluster": "maison",
+      "parent": "la_cuisine"
+    },
+    "four": {
+      "id": "four",
+      "display": { "fr": "four", "en": "oven" },
+      "cluster": "maison",
+      "parent": "la_cuisine"
+    },
+    "evier": {
+      "id": "evier",
+      "display": { "fr": "évier", "en": "sink" },
+      "cluster": "maison",
+      "parent": "la_cuisine"
+    }
+  }
+}
