@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/react'
 import { useState } from 'react'
 import data from './data.json'
 import './App.css'
@@ -180,7 +179,6 @@ function App() {
       <div className="neighbourhood-tag">
         {current.cluster}
       </div>
-      <Analytics />
     </div>
   )
 }
