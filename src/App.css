@@ -1,9 +1,24 @@
+/* ==========================================================================
+   1. Base Structural Reset & Layout Scaffolding
+   ========================================================================== */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
 .app {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  transition: background-color 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
 }
 
 .node-container {
@@ -11,33 +26,190 @@
   align-items: center;
   justify-content: center;
   gap: 60px;
-  margin-top: 40px;
+  width: 100%;
+  position: relative;
+  height: 250px; /* Structural safety track for absolute positioning swaps */
 }
 
+.satellite-wrapper {
+  width: 150px;
+  height: 150px;
+  min-height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* ==========================================================================
+   2. Core & Satellite Base Node Styling
+   ========================================================================== */
 .node-core {
   width: 200px;
   height: 200px;
+  min-width: 200px;
+  min-height: 200px;
   border-radius: 50%;
-  background-color: #5B7BE8;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   color: white;
+  z-index: 5;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.04);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
 }
 
 .node-satellite {
   width: 120px;
   height: 120px;
+  min-width: 120px;   /* CRITICAL: Prevents horizontal squashing */
+  min-height: 120px;  /* CRITICAL: Prevents vertical squashing */
+  flex-shrink: 0;     /* CRITICAL: Tells flexbox it is not allowed to pinch this circle */
   border-radius: 50%;
   border: 2px solid;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   text-align: center;
-  padding: 12px;
+  box-sizing: border-box;
+  padding: 16px;
+  z-index: 12;
+  transition: 
+    width 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    height 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    min-width 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    min-height 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+    background-color 0.3s ease, 
+    color 0.3s ease,
+    opacity 0.35s ease,
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.node-satellite:hover:not(.active-target) {
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   3. Phase I: Charging & Morphing In-Place (No-Squash Layer)
+   ========================================================================== */
+/* The .exiting class instantly breaks the keyframe lock when navigation starts */
+.node-core.exiting {
+  opacity: 0 !important;
+  transform: scale(0.85) !important;
+  transition: opacity 0.12s ease, transform 0.12s ease !important;
+}
+
+/* Clear away the unclicked option immediately */
+.system-navigating .node-satellite:not(.active-target) {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+/* Morph target structural dimensions cleanly within its layout orbit */
+.node-satellite.active-target {
+  width: 200px;
+  height: 200px;
+  min-width: 200px;
+  min-height: 200px;
+  z-index: 20;
+}
+
+.node-satellite.active-target .node-fr {
+  font-size: 1.5rem;
+  transition: font-size 0.35s ease;
+}
+
+.satellite-translation {
+  animation: fadeInTranslation 0.25s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 1.4rem !important;
+  margin-top: 4px;
+}
+
+@keyframes fadeInTranslation {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   4. Phase II: Smooth Isolation Translation Track
+   ========================================================================== */
+/* Apply physical slide movements directly to the uniquely classed node element */
+.node-satellite.active-target.near.slide-to-center {
+  transform: translateX(-210px);
+}
+
+.node-satellite.active-target.abstract.slide-to-center {
+  transform: translateX(210px);
+}
+
+/* Mobile Portrait tracking adjustment */
+@media (max-width: 768px) and (orientation: portrait) {
+  .node-satellite.active-target.near.slide-to-center {
+    transform: translateY(210px);
+  }
+
+  .node-satellite.active-target.abstract.slide-to-center {
+    transform: translateY(-210px);
+  }
+}
+
+/* ==========================================================================
+   5. System Data Mounting Entry Animations (Pop/Flash Fix)
+   ========================================================================== */
+@keyframes entryFromRight {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes entryFromLeft {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* The new core simply fades in exactly where the satellite finished its slide,
+   creating a perfect visual hand-shake without secondary shifting. */
+.node-core.from-near { 
+  animation: entryFromRight 0.2s ease forwards;
+  animation: none;
+}
+.node-core.from-abstract { 
+  animation: entryFromLeft 0.2s ease forwards; 
+  animation: none;
+}
+
+/* ==========================================================================
+   6. Global Typography Styles
+   ========================================================================== */
+h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.node-fr {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: font-size 0.2s ease;
+  letter-spacing: 0rem;
+}
+
+.node-en {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.3rem;
+  line-height: 1.2em;
+  font-weight: 700;
+  margin-top: 4px;
 }
 
 .neighbourhood-tag {
@@ -52,55 +224,102 @@
   opacity: 0.75;
   padding: 6px 16px;
   border-radius: 20px;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.06);
   color: #333;
 }
 
-.app {
-  transition: background-color 0.6s ease;
+/* ==========================================================================
+   7. Media Queries: Mobile Portrait Breakpoint
+   ========================================================================== */
+@media (max-width: 768px) and (orientation: portrait) {
+  .app {
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .node-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    height: auto !important;
+    min-height: 480px;
+  }
+  
+.node-core {
+    order: 2;
+    flex-shrink: 0;
+  }
+.near-wrapper { order: 1; }
+.node-core { order: 2; }
+.abstract-wrapper { order: 3; }
+
+  .neighbourhood-tag {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+  }
+
+  /* Structural Centering Swap for Mobile Flow */
+  .satellite-wrapper {
+    height: 150px;
+    min-height: 150px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .phase-sliding .node-satellite.active-target {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .node-core.from-near {
+    animation: entryFromBottom 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: none;
+  }
+  .node-core.from-abstract {
+    animation: entryFromTop 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: none;
+  }
 }
 
-h1 {
-  font-family: 'Bricolage Grotesque', sans-serif;
-  position: fixed;
-  top: 24px;
-  left: 24px;
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-  opacity: 0.75;
+@keyframes entryFromBottom {
+  from { transform: scale(0.8) translateY(160px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-.node-fr {
-  font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 600;
+@keyframes entryFromTop {
+  from { transform: scale(0.8) translateY(-160px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-.node-en {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 1.4rem;
-  opacity: 0.75;
-  line-height: 1.4em;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-@keyframes slideFromRight {
-  from { transform: translateX(180px); opacity: 0.5; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideFromLeft {
-  from { transform: translateX(-180px); opacity: 0.5; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-.node-core.from-near {
-  animation: slideFromRight 0.35s ease;
-}
-
-.node-core.from-abstract {
-  animation: slideFromLeft 0.35s ease;
+/* ==========================================================================
+   8. Media Queries: Tiny Landscape Framework
+   ========================================================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .node-container {
+    gap: 30px;
+  }
+  
+  .node-core {
+    width: 150px !important;
+    height: 150px !important;
+    min-width: 150px;
+    min-height: 150px;
+  }
+  
+  .node-satellite {
+    width: 95px;
+    height: 95px;
+  }
 }

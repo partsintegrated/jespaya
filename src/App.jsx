@@ -4,7 +4,6 @@ import './App.css'
 
 const preflight = (data) => {
   const errors = []
-  
   Object.values(data.anchors).forEach(anchor => {
     anchor.satellites.forEach(id => {
       if (!data.satellites[id]) {
@@ -12,24 +11,16 @@ const preflight = (data) => {
       }
     })
   })
-
-  if (errors.length > 0) {
-    console.warn('Jespaya preflight errors:')
-    errors.forEach(e => console.warn(e))
-  } else {
-    console.log('Jespaya preflight: all satellites accounted for ✓')
-  }
+  if (errors.length > 0) console.warn('Jespaya preflight errors:', errors)
 }
 
 const findBridges = (data) => {
   const satelliteCount = {}
-  
   Object.values(data.anchors).forEach(anchor => {
     anchor.satellites.forEach(id => {
       satelliteCount[id] = (satelliteCount[id] || 0) + 1
     })
   })
-  
   return Object.keys(satelliteCount).filter(id => satelliteCount[id] > 1)
 }
 
@@ -39,7 +30,11 @@ function App() {
 
   const [currentId, setCurrentId] = useState('corps')
   const [history, setHistory] = useState([])
-  const [animating, setAnimating] = useState(null)
+  
+  // Track system flow state
+  const [activeTargetId, setActiveTargetId] = useState(null) // Stores the clicked ID during navigation
+  const [slideTriggered, setSlideTriggered] = useState(false) // Triggers the center glide
+  const [lastDirection, setLastDirection] = useState('near')
 
   const allConcepts = { ...data.anchors, ...data.satellites }
   const current = allConcepts[currentId]
@@ -53,7 +48,7 @@ function App() {
     abstract: { bg: '#fde8f0', core: '#E85BA0' }
   }
 
-  const colours = clusterColours[current.cluster] || { bg: '#f5f5f5', core: '#333' }
+  const colours = clusterColours[current?.cluster] || { bg: '#f5f5f5', core: '#333' }
 
   const generateNextOptions = (targetId, currentHistory) => {
     const excluded = [...currentHistory, targetId]
@@ -68,98 +63,109 @@ function App() {
     if (!targetConcept) return { near: null, abstract: null }
 
     if (isAnchor) {
-      nearOptions = targetConcept.satellites.filter(id => 
-        allConcepts[id] && !excluded.includes(id)
-      )
-      abstractOptions = Object.keys(data.anchors).filter(id => 
-        id !== targetId && !excluded.includes(id)
-      )
+      nearOptions = targetConcept.satellites.filter(id => allConcepts[id] && !excluded.includes(id))
+      abstractOptions = Object.keys(data.anchors).filter(id => id !== targetId && !excluded.includes(id))
     }
 
     if (isSatellite) {
       const parentId = Array.isArray(targetConcept.parent) ? targetConcept.parent[0] : targetConcept.parent
       const parent = data.anchors[parentId]
       
-      nearOptions = parent.satellites.filter(id => 
-        allConcepts[id] && !excluded.includes(id) && id !== targetId
-      )
+      nearOptions = parent ? parent.satellites.filter(id => allConcepts[id] && !excluded.includes(id) && id !== targetId) : []
 
       if (isBridge) {
-        const otherParentId = Array.isArray(targetConcept.parent) 
-          ? targetConcept.parent.find(id => id !== parentId) 
-          : null
-        if (otherParentId) {
-          abstractOptions = [otherParentId]
-        }
+        const otherParentId = Array.isArray(targetConcept.parent) ? targetConcept.parent.find(id => id !== parentId) : null
+        if (otherParentId) abstractOptions = [otherParentId]
       } else {
-        abstractOptions = Object.keys(data.anchors).filter(id => 
-          !excluded.includes(id)
-        )
+        abstractOptions = Object.keys(data.anchors).filter(id => !excluded.includes(id))
       }
     }
 
     const pick = (arr) => (arr.length === 0 ? null : arr[Math.floor(Math.random() * arr.length)])
-
-    return {
-      near: pick(nearOptions),
-      abstract: pick(abstractOptions)
-    }
+    return { near: pick(nearOptions), abstract: pick(abstractOptions) }
   }
 
   const [options, setOptions] = useState(() => generateNextOptions('corps', []))
 
   const navigate = (id, direction) => {
-    if (animating) return 
+    if (activeTargetId) return
     
-    setAnimating(direction)
+    setLastDirection(direction)
+    setActiveTargetId(id) // System enters "charging" phase natively for this ID
     
+    // Act I: Charge up and expand in place (350ms)
     setTimeout(() => {
-      const nextHistory = [...history.slice(-4), currentId]
+      setSlideTriggered(true) // Act II: Initiate center glide
       
-      setHistory(nextHistory)
-      setCurrentId(id)
-      setOptions(generateNextOptions(id, nextHistory))
-      setAnimating(null)
-    }, 350)
+      // Act III: Swap data cleanly at the end of the physical slide path (400ms)
+      setTimeout(() => {
+        const nextHistory = [...history.slice(-2), currentId]
+        setHistory(nextHistory)
+        setCurrentId(id)
+        setOptions(generateNextOptions(id, nextHistory))
+        
+        // Reset navigation states completely
+        setActiveTargetId(null)
+        setSlideTriggered(false)
+      }, 550)
+    }, 350) 
   }
 
   const { near: nearId, abstract: abstractId } = options
+  if (!current) return null
 
   return (
     <div className="app" style={{ backgroundColor: colours.bg }}>
       <h1>Jespaya</h1>
-      <div className="node-container">
-        <div style={{ width: '150px', display: 'flex', justifyContent: 'center' }}>
+      
+      <div className={`node-container ${activeTargetId ? 'system-navigating' : 'system-idle'}`}>
+        
+        {/* Abstract Option */}
+        <div className="satellite-wrapper abstract-wrapper" key={`abstract-slot-${abstractId || 'empty'}`}>
           {abstractId && (
             <div
-              key={`abstract-${currentId}`}
-              className="node-satellite abstract"
-              style={{ borderColor: colours.core, color: colours.core }}
+              className={`node-satellite abstract ${activeTargetId === abstractId ? 'active-target' : ''} ${slideTriggered && activeTargetId === abstractId ? 'slide-to-center' : ''}`}
+              style={{ 
+                borderColor: colours.core, 
+                color: activeTargetId === abstractId ? '#fff' : colours.core,
+                backgroundColor: activeTargetId === abstractId ? colours.core : 'transparent'
+              }}
               onClick={() => navigate(abstractId, 'abstract')}
             >
-              {allConcepts[abstractId]?.display.fr}
+              <span className="node-fr">{allConcepts[abstractId]?.display.fr}</span>
+              {activeTargetId === abstractId && (
+                <span className="node-en satellite-translation">{allConcepts[abstractId]?.display.en}</span>
+              )}
             </div>
           )}
         </div>
 
+        {/* Core Node */}
         <div 
-          key={`core-${currentId}`}
-          className={`node-core from-${animating || 'near'}`}
+          key={`core-${currentId}`} 
+          className={`node-core ${activeTargetId ? 'exiting' : `from-${lastDirection}`}`}
           style={{ backgroundColor: colours.core }}
         >
           <span className="node-fr">{current.display.fr}</span>
           <span className="node-en">{current.display.en}</span>
         </div>
 
-        <div style={{ width: '150px', display: 'flex', justifyContent: 'center' }}>
+        {/* Near Option */}
+        <div className="satellite-wrapper near-wrapper" key={`near-slot-${nearId || 'empty'}`}>
           {nearId && (
             <div
-              key={`near-${currentId}`}
-              className="node-satellite near"
-              style={{ borderColor: colours.core, color: colours.core }}
+              className={`node-satellite near ${activeTargetId === nearId ? 'active-target' : ''} ${slideTriggered && activeTargetId === nearId ? 'slide-to-center' : ''}`}
+              style={{ 
+                borderColor: colours.core, 
+                color: activeTargetId === nearId ? '#fff' : colours.core,
+                backgroundColor: activeTargetId === nearId ? colours.core : 'transparent'
+              }}
               onClick={() => navigate(nearId, 'near')}
             >
-              {allConcepts[nearId]?.display.fr}
+              <span className="node-fr">{allConcepts[nearId]?.display.fr}</span>
+              {activeTargetId === nearId && (
+                <span className="node-en satellite-translation">{allConcepts[nearId]?.display.en}</span>
+              )}
             </div>
           )}
         </div>
