@@ -11,7 +11,11 @@ const preflight = (data) => {
       }
     })
   })
-  if (errors.length > 0) console.warn('Jespaya preflight errors:', errors)
+  if (errors.length > 0) {
+    console.warn('Jespaya preflight errors:', errors)
+  } else {
+    console.log('Jespaya preflight: all satellites accounted for ✓')
+  }
 }
 
 const findBridges = (data) => {
@@ -45,7 +49,8 @@ function App() {
     nature: { bg: '#e8fef0', core: '#5BE88A' },
     technologie: { bg: '#f0e8fe', core: '#A05BE8' },
     numbers: { bg: '#fef8e8', core: '#E8C45B' },
-    abstract: { bg: '#fde8f0', core: '#E85BA0' }
+    abstract: { bg: '#fde8f0', core: '#E85BA0' },
+    dehors: { bg: '#edf7ed', core: '#4a8c4a' },
   }
 
   const colours = clusterColours[current?.cluster] || { bg: '#f5f5f5', core: '#333' }

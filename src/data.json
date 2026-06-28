@@ -11,7 +11,19 @@
       "display": { "fr": "la cuisine", "en": "kitchen" },
       "cluster": "maison",
       "satellites": ["cuisiniere", "poele", "four", "evier", "boire"]
-    }
+    },
+  "voyage": {
+    "id": "voyage",
+    "display": { "fr": "voyage", "en": "travel" },
+    "cluster": "dehors",
+    "satellites": ["ferroviaire", "voiture", "conduire", "marcher", "nord", "sud", "est", "ouest"]
+  },
+  "au_dehors": {
+    "id": "au_dehors",
+    "display": { "fr": "au dehors", "en": "outside" },
+    "cluster": "dehors",
+    "satellites": ["abeille", "aiguillon", "guepes", "moustique", "criquet", "marcher"]
+  }
   },
   "satellites": {
     "cerveau": {
@@ -23,12 +35,6 @@
     "sante": {
       "id": "sante",
       "display": { "fr": "santé", "en": "health" },
-      "cluster": "physical",
-      "parent": "corps"
-    },
-    "marcher": {
-      "id": "marcher",
-      "display": { "fr": "marcher", "en": "walk" },
       "cluster": "physical",
       "parent": "corps"
     },
@@ -61,6 +67,84 @@
       "display": { "fr": "évier", "en": "sink" },
       "cluster": "maison",
       "parent": "la_cuisine"
+    },
+    "ferroviaire": {
+    "id": "ferroviaire",
+    "display": { "fr": "ferroviaire", "en": "railway" },
+    "cluster": "dehors",
+    "parent": "voyage"
+    },
+    "voiture": {
+      "id": "voiture",
+      "display": { "fr": "voiture", "en": "car" },
+      "cluster": "dehors",
+      "parent": "voyage"
+    },
+    "conduire": {
+      "id": "conduire",
+      "display": { "fr": "conduire", "en": "drive" },
+      "cluster": "dehors",
+      "parent": "voyage"
+    },
+    "marcher": {
+      "id": "marcher",
+      "display": { "fr": "marcher", "en": "walk" },
+      "cluster": "dehors",
+      "parent": ["voyage", "au_dehors"]
+    },
+    "nord": {
+      "id": "nord",
+      "display": { "fr": "nord", "en": "north" },
+      "cluster": "dehors",
+      "parent": "voyage"
+    },
+    "sud": {
+      "id": "sud",
+      "display": { "fr": "sud", "en": "south" },
+      "cluster": "dehors",
+      "parent": "voyage"
+    },
+    "est": {
+      "id": "est",
+      "display": { "fr": "est", "en": "east" },
+      "cluster": "dehors",
+      "parent": "voyage"
+    },
+    "ouest": {
+      "id": "ouest",
+      "display": { "fr": "ouest", "en": "west" },
+      "cluster": "dehors",
+      "parent": "voyage"
+    },
+    "abeille": {
+      "id": "abeille",
+      "display": { "fr": "abeille", "en": "bee" },
+      "cluster": "dehors",
+      "parent": "au_dehors"
+    },
+    "aiguillon": {
+      "id": "aiguillon",
+      "display": { "fr": "aiguillon", "en": "sting" },
+      "cluster": "dehors",
+      "parent": "au_dehors"
+    },
+    "guepes": {
+      "id": "guepes",
+      "display": { "fr": "guêpe(s)", "en": "wasp(s)" },
+      "cluster": "dehors",
+      "parent": "au_dehors"
+    },
+    "moustique": {
+      "id": "moustique",
+      "display": { "fr": "moustique", "en": "mosquito" },
+      "cluster": "dehors",
+      "parent": "au_dehors"
+    },
+    "criquet": {
+      "id": "criquet",
+      "display": { "fr": "criquet", "en": "cricket" },
+      "cluster": "dehors",
+      "parent": "au_dehors"
     }
   }
 }

@@ -92,6 +92,11 @@ html, body, #root {
   transform: scale(1.05);
 }
 
+.node-satellite .node-fr {
+  font-size: 1.15rem;
+  line-height: 1.1em;
+}
+
 /* ==========================================================================
    3. Phase I: Charging & Morphing In-Place (No-Squash Layer)
    ========================================================================== */
@@ -207,7 +212,7 @@ h1 {
   font-family: 'Playfair Display', serif;
   font-style: italic;
   font-size: 1.3rem;
-  line-height: 1.2em;
+  line-height: 0.9em;
   font-weight: 700;
   margin-top: 4px;
 }
