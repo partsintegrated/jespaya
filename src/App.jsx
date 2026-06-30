@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import data from './data.json'
 import './App.css'
 
@@ -31,14 +32,13 @@ const findBridges = (data) => {
 function App() {
   preflight(data)
   const bridges = findBridges(data)
-
+ 
   const [currentId, setCurrentId] = useState('corps')
   const [history, setHistory] = useState([])
   
   // Track system flow state
-  const [activeTargetId, setActiveTargetId] = useState(null) // Stores the clicked ID during navigation
-  const [slideTriggered, setSlideTriggered] = useState(false) // Triggers the center glide
   const [lastDirection, setLastDirection] = useState('near')
+  const [animatingTarget, setAnimatingTarget] = useState(null); // 'near', 'abstract', or null
 
   const allConcepts = { ...data.anchors, ...data.satellites }
   const current = allConcepts[currentId]
@@ -47,7 +47,7 @@ function App() {
     physical: { bg: '#e8f0fe', core: '#5B7BE8' },
     maison: { bg: '#fef3e8', core: '#E8845B' },
     nature: { bg: '#e8fef0', core: '#5BE88A' },
-    technologie: { bg: '#f0e8fe', core: '#A05BE8' },
+    technologie: { bg: '#f2f2f2', core: '#444444' },
     numbers: { bg: '#fef8e8', core: '#E8C45B' },
     abstract: { bg: '#fde8f0', core: '#E85BA0' },
     dehors: { bg: '#edf7ed', core: '#4a8c4a' },
@@ -92,95 +92,151 @@ function App() {
 
   const [options, setOptions] = useState(() => generateNextOptions('corps', []))
 
-  const navigate = (id, direction) => {
-    if (activeTargetId) return
+const navigate = (id, direction) => {
+  console.log('Initiating transition via:', direction);
+  
+  // Phase 1: Lock out the unclicked slot and trigger the physical slide direction
+  setAnimatingTarget(direction);
+  setLastDirection(direction);
+
+  // Phase 2: Wait 250ms for the old core to clear and the layout to shift data
+  setTimeout(() => {
+    const nextHistory = [...history.slice(-2), currentId];
+    setHistory(nextHistory);
+    setCurrentId(id); // The core changes text NOW
     
-    setLastDirection(direction)
-    setActiveTargetId(id) // System enters "charging" phase natively for this ID
-    
-    // Act I: Charge up and expand in place (350ms)
+    // Phase 3: Stagger the satellite mount. Wait another 200ms before showing new options
     setTimeout(() => {
-      setSlideTriggered(true) // Act II: Initiate center glide
-      
-      // Act III: Swap data cleanly at the end of the physical slide path (400ms)
-      setTimeout(() => {
-        const nextHistory = [...history.slice(-2), currentId]
-        setHistory(nextHistory)
-        setCurrentId(id)
-        setOptions(generateNextOptions(id, nextHistory))
-        
-        // Reset navigation states completely
-        setActiveTargetId(null)
-        setSlideTriggered(false)
-      }, 550)
-    }, 350) 
-  }
+      setOptions(generateNextOptions(id, nextHistory));
+      setAnimatingTarget(null); // Unlock so they fade in cleanly
+    }, 900);
+
+  }, 250); 
+};
 
   const { near: nearId, abstract: abstractId } = options
   if (!current) return null
 
+const isPortrait = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px) and (orientation: portrait)').matches;
+
+const coreVariants = {
+  initial: (direction) => {
+    if (isPortrait) {
+      return { 
+        opacity: 0, 
+        y: direction === 'near' ? -210 : 210, 
+        x: 0,
+        scale: 0.75, 
+        zIndex: 1 
+      };
+    }
+    return { 
+      opacity: 0, 
+      x: direction === 'near' ? 240 : -240, 
+      y: 0, 
+      scale: 0.75,
+      zIndex: 1 
+    };
+  },
+  animate: { 
+    opacity: 1, 
+    x: 0, 
+    y: 0,
+    scale: 1,
+    zIndex: 10, // Active core is pinned securely to the top layer
+    transition: { type: "spring", stiffness: 500, damping: 45 } 
+  },
+  exit: (direction) => {
+    if (isPortrait) {
+      return { 
+        opacity: 0, 
+        y: direction === 'near' ? 210 : -210, 
+        x: 0, 
+        zIndex: 0, // Drop the exiting element completely to the bottom layer
+        position: "absolute",
+        transition: { duration: 0 } // Force a rapid fade so it clears the viewport quickly
+      };
+    }
+    return { 
+      opacity: 0, 
+      x: direction === 'near' ? -240 : 240, 
+      y: 0, 
+      zIndex: 0, // Drop desktop exiting element to the bottom layer
+      position: "absolute",
+      transition: { duration: 0 } 
+    };
+  }
+};
+
   return (
-    <div className="app" style={{ backgroundColor: colours.bg }}>
-      <h1>Jespaya</h1>
+  <div className="app" style={{ backgroundColor: colours.bg }}>
+    <h1>Jespaya</h1>
+    
+    <div className="node-container">
       
-      <div className={`node-container ${activeTargetId ? 'system-navigating' : 'system-idle'}`}>
-        
-        {/* Abstract Option */}
-        <div className="satellite-wrapper abstract-wrapper" key={`abstract-slot-${abstractId || 'empty'}`}>
-          {abstractId && (
-            <div
-              className={`node-satellite abstract ${activeTargetId === abstractId ? 'active-target' : ''} ${slideTriggered && activeTargetId === abstractId ? 'slide-to-center' : ''}`}
-              style={{ 
-                borderColor: colours.core, 
-                color: activeTargetId === abstractId ? '#fff' : colours.core,
-                backgroundColor: activeTargetId === abstractId ? colours.core : 'transparent'
-              }}
+      {/* Abstract Option Slot - Static Key */}
+      <div className="satellite-wrapper abstract-wrapper" key="abstract-slot-static">
+        <AnimatePresence mode="popLayout">
+          {abstractId && animatingTarget !== 'near' && (
+            <motion.div
+              key={abstractId} // Unique key goes inside the presence checker
+              className="node-satellite abstract"
+              style={{ borderColor: colours.core, color: colours.core }}
               onClick={() => navigate(abstractId, 'abstract')}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: animatingTarget === 'abstract' ? 0 : 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.1 }}
             >
               <span className="node-fr">{allConcepts[abstractId]?.display.fr}</span>
-              {activeTargetId === abstractId && (
-                <span className="node-en satellite-translation">{allConcepts[abstractId]?.display.en}</span>
-              )}
-            </div>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
+      </div>
 
-        {/* Core Node */}
-        <div 
-          key={`core-${currentId}`} 
-          className={`node-core ${activeTargetId ? 'exiting' : `from-${lastDirection}`}`}
+      {/* Core Node */}
+      <AnimatePresence mode="popLayout" custom={lastDirection}>
+        <motion.div
+          key={currentId} 
+          className="node-core"
           style={{ backgroundColor: colours.core }}
+          custom={lastDirection}
+          variants={coreVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
         >
           <span className="node-fr">{current.display.fr}</span>
           <span className="node-en">{current.display.en}</span>
-        </div>
+        </motion.div>
+      </AnimatePresence>
 
-        {/* Near Option */}
-        <div className="satellite-wrapper near-wrapper" key={`near-slot-${nearId || 'empty'}`}>
-          {nearId && (
-            <div
-              className={`node-satellite near ${activeTargetId === nearId ? 'active-target' : ''} ${slideTriggered && activeTargetId === nearId ? 'slide-to-center' : ''}`}
-              style={{ 
-                borderColor: colours.core, 
-                color: activeTargetId === nearId ? '#fff' : colours.core,
-                backgroundColor: activeTargetId === nearId ? colours.core : 'transparent'
-              }}
+      {/* Near Option Slot - Static Key */}
+      <div className="satellite-wrapper near-wrapper" key="near-slot-static">
+        <AnimatePresence mode="popLayout">
+          {nearId && animatingTarget !== 'abstract' && (
+            <motion.div
+              key={nearId} // Unique key goes inside the presence checker
+              className="node-satellite near"
+              style={{ borderColor: colours.core, color: colours.core }}
               onClick={() => navigate(nearId, 'near')}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: animatingTarget === 'near' ? 0 : 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.1 }}
             >
               <span className="node-fr">{allConcepts[nearId]?.display.fr}</span>
-              {activeTargetId === nearId && (
-                <span className="node-en satellite-translation">{allConcepts[nearId]?.display.en}</span>
-              )}
-            </div>
+            </motion.div>
           )}
-        </div>
-      </div>
-      
-      <div className="neighbourhood-tag">
-        {current.cluster}
+        </AnimatePresence>
       </div>
     </div>
-  )
+    
+    <div className="neighbourhood-tag">
+      {current.cluster}
+    </div>
+  </div>
+)
 }
 
 export default App

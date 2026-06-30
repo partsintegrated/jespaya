@@ -23,7 +23,13 @@
     "display": { "fr": "au dehors", "en": "outside" },
     "cluster": "dehors",
     "satellites": ["abeille", "aiguillon", "guepes", "moustique", "criquet", "marcher"]
-  }
+  },
+  "la_technologie": {
+  "id": "la_technologie",
+  "display": { "fr": "technologie", "en": "tech" },
+  "cluster": "technologie",
+  "satellites": ["ordinateur", "ecran", "appareils", "charger", "hors_ligne", "tableau", "mot_de_passe", "telecharger", "effectuer", "declic", "soumettre", "onglet", "reponse", "mot", "ecouter", "ecrire", "plume", "connexion", "tableau_blanc", "sons", "mis_a_jour", "reseau", "fichier", "donnees", "pare_feu", "point_tech", "effacer", "coupe", "copie", "mettre"]
+}
   },
   "satellites": {
     "cerveau": {
@@ -145,6 +151,186 @@
       "display": { "fr": "criquet", "en": "cricket" },
       "cluster": "dehors",
       "parent": "au_dehors"
-    }
+    },
+    "tableau_blanc": {
+  "id": "tableau_blanc",
+  "display": { "fr": "tableau blanc", "en": "whiteboard" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"sons": {
+  "id": "sons",
+  "display": { "fr": "sons", "en": "sounds" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"mis_a_jour": {
+  "id": "mis_a_jour",
+  "display": { "fr": "mis à jour", "en": "updated" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"reseau": {
+  "id": "reseau",
+  "display": { "fr": "réseau", "en": "network" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"fichier": {
+  "id": "fichier",
+  "display": { "fr": "fichier", "en": "file" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"donnees": {
+  "id": "donnees",
+  "display": { "fr": "données", "en": "data" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"pare_feu": {
+  "id": "pare_feu",
+  "display": { "fr": "pare-feu", "en": "firewall" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"point_tech": {
+  "id": "point_tech",
+  "display": { "fr": "point", "en": "point, dot" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"effacer": {
+  "id": "effacer",
+  "display": { "fr": "effacer", "en": "erase, delete" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"coupe": {
+  "id": "coupe",
+  "display": { "fr": "coupé", "en": "cut" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"copie": {
+  "id": "copie",
+  "display": { "fr": "copie", "en": "copy" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"mettre": {
+  "id": "mettre",
+  "display": { "fr": "mettre", "en": "put, place, apply" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+  },
+  "ordinateur": {
+  "id": "ordinateur",
+  "display": { "fr": "ordinateur", "en": "computer" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"ecran": {
+  "id": "ecran",
+  "display": { "fr": "écran", "en": "screen" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"appareils": {
+  "id": "appareils",
+  "display": { "fr": "appareils", "en": "devices" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"charger": {
+  "id": "charger",
+  "display": { "fr": "charger", "en": "load, charge" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"hors_ligne": {
+  "id": "hors_ligne",
+  "display": { "fr": "hors ligne", "en": "offline" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"tableau": {
+  "id": "tableau",
+  "display": { "fr": "tableau", "en": "table, chart" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"mot_de_passe": {
+  "id": "mot_de_passe",
+  "display": { "fr": "mot de passe", "en": "password" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"telecharger": {
+  "id": "telecharger",
+  "display": { "fr": "télécharger", "en": "download" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"effectuer": {
+  "id": "effectuer",
+  "display": { "fr": "effectuer", "en": "perform, execute" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"declic": {
+  "id": "declic",
+  "display": { "fr": "déclic", "en": "click" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"soumettre": {
+  "id": "soumettre",
+  "display": { "fr": "soumettre", "en": "submit" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"onglet": {
+  "id": "onglet",
+  "display": { "fr": "onglet", "en": "tab" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"reponse": {
+  "id": "reponse",
+  "display": { "fr": "réponse", "en": "reply" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"mot": {
+  "id": "mot",
+  "display": { "fr": "mot", "en": "word" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"ecouter": {
+  "id": "ecouter",
+  "display": { "fr": "écouter", "en": "to listen" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"ecrire": {
+  "id": "ecrire",
+  "display": { "fr": "écrire", "en": "write" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"plume": {
+  "id": "plume",
+  "display": { "fr": "plume", "en": "pen, feather" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+},
+"connexion": {
+  "id": "connexion",
+  "display": { "fr": "connexion", "en": "connection" },
+  "cluster": "technologie",
+  "parent": "la_technologie"
+  }
   }
 }

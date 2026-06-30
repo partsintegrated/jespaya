@@ -41,6 +41,10 @@ html, body, #root {
   position: relative;
 }
 
+.node-satellite, .node-core {
+  user-select: none;
+}
+
 /* ==========================================================================
    2. Core & Satellite Base Node Styling
    ========================================================================== */
