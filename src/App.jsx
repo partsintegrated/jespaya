@@ -37,6 +37,7 @@ function App() {
   const [history, setHistory] = useState([])
   
   // Track system flow state
+  const [hasInteracted, setHasInteracted] = useState(false)
   const [lastDirection, setLastDirection] = useState('near')
   const [animatingTarget, setAnimatingTarget] = useState(null); // 'near', 'abstract', or null
 
@@ -93,6 +94,7 @@ function App() {
   const [options, setOptions] = useState(() => generateNextOptions('corps', []))
 
 const navigate = (id, direction) => {
+  setHasInteracted(true)
   console.log('Initiating transition via:', direction);
   
   // Phase 1: Lock out the unclicked slot and trigger the physical slide direction
@@ -109,7 +111,7 @@ const navigate = (id, direction) => {
     setTimeout(() => {
       setOptions(generateNextOptions(id, nextHistory));
       setAnimatingTarget(null); // Unlock so they fade in cleanly
-    }, 900);
+    }, 700);
 
   }, 250); 
 };
@@ -126,7 +128,7 @@ const coreVariants = {
         opacity: 0, 
         y: direction === 'near' ? -210 : 210, 
         x: 0,
-        scale: 0.75, 
+        scale: 0.9, 
         zIndex: 1 
       };
     }
@@ -134,7 +136,7 @@ const coreVariants = {
       opacity: 0, 
       x: direction === 'near' ? 240 : -240, 
       y: 0, 
-      scale: 0.75,
+      scale: 0.9,
       zIndex: 1 
     };
   },
@@ -144,7 +146,7 @@ const coreVariants = {
     y: 0,
     scale: 1,
     zIndex: 10, // Active core is pinned securely to the top layer
-    transition: { type: "spring", stiffness: 500, damping: 45 } 
+    transition: { type: "spring", stiffness: 1000, damping: 65, delay: 0.4, opacity: { duration: 0.1 } } 
   },
   exit: (direction) => {
     if (isPortrait) {
@@ -202,7 +204,7 @@ const coreVariants = {
           style={{ backgroundColor: colours.core }}
           custom={lastDirection}
           variants={coreVariants}
-          initial="initial"
+          initial={hasInteracted ? "initial" : false}
           animate="animate"
           exit="exit"
         >
